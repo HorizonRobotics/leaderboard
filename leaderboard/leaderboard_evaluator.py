@@ -89,7 +89,7 @@ class LeaderboardEvaluator(object):
         self.module_agent = importlib.import_module(module_name)
 
         # Create the ScenarioManager
-        self.manager = ScenarioManager(args.timeout, self.statistics_manager, args.debug)
+        self.manager = self.get_scenario_manager_cls(args)(args.timeout, self.statistics_manager, args.debug)
 
         # Time control for summary purposes
         self._start_time = GameTime.get_time()
@@ -100,6 +100,14 @@ class LeaderboardEvaluator(object):
         signal.signal(signal.SIGINT, self._signal_handler)
 
         self._client_timed_out = False
+    
+    @staticmethod
+    def get_scenario_manager_cls(args):
+        return ScenarioManager
+
+    @staticmethod
+    def get_route_scenario_cls(args):
+        return RouteScenario
 
     def _signal_handler(self, signum, frame):
         """
@@ -263,7 +271,7 @@ class LeaderboardEvaluator(object):
         # Load the world and the scenario
         try:
             self._load_and_wait_for_world(args, config.town)
-            self.route_scenario = RouteScenario(world=self.world, config=config, debug_mode=args.debug)
+            self.route_scenario = self.get_route_scenario_cls(args)(world=self.world, config=config, debug_mode=args.debug)
             self.statistics_manager.set_scenario(self.route_scenario)
 
         except Exception:
