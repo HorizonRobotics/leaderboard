@@ -112,6 +112,7 @@ class RouteParser(object):
             route_config = RouteScenarioConfiguration()
             route_config.town = route.attrib['town']
             route_config.name = "RouteScenario_{}".format(route_id)
+            route_config.route_id = route_id
             route_config.weather = RouteParser.parse_weather(route)
 
             # The list of carla.Location that serve as keypoints on this route
