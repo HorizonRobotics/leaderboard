@@ -190,6 +190,7 @@ class LeaderboardEvaluator(object):
         traffic_manager = client.get_trafficmanager(args.traffic_manager_port)
         traffic_manager.set_synchronous_mode(True)
         traffic_manager.set_hybrid_physics_mode(True)
+        traffic_manager.set_hybrid_physics_radius(200)
 
         return client, client_timeout, traffic_manager
 
