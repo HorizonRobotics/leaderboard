@@ -93,6 +93,7 @@ def downsample_route(route, sample_factor):
     ids_to_sample = []
     prev_option = None
     dist = 0
+    lane_change_end = None
 
     for i, point in enumerate(route):
         curr_option = point[1]
@@ -103,14 +104,19 @@ def downsample_route(route, sample_factor):
             dist = 0
 
         # Lane changing
-        elif curr_option in (RoadOption.CHANGELANELEFT, RoadOption.CHANGELANERIGHT):
-            ids_to_sample.append(i)
-            dist = 0
+        # elif curr_option in (RoadOption.CHANGELANELEFT, RoadOption.CHANGELANERIGHT):
+        #     ids_to_sample.append(i)
+        #     dist = 0
 
         # When entering or exitting intersections
-        elif prev_option != curr_option and prev_option not in (RoadOption.CHANGELANELEFT, RoadOption.CHANGELANERIGHT):
-            ids_to_sample.append(i)
-            dist = 0
+        # elif prev_option != curr_option and prev_option not in (RoadOption.CHANGELANELEFT, RoadOption.CHANGELANERIGHT):
+        elif prev_option != curr_option:
+            if prev_option not in (RoadOption.CHANGELANELEFT, RoadOption.CHANGELANERIGHT):
+                ids_to_sample.append(i)
+                dist = 0
+                lane_change_end = None
+            else:
+                lane_change_end = point
 
         # After a certain max distance
         elif dist > sample_factor:
@@ -127,6 +133,12 @@ def downsample_route(route, sample_factor):
             curr_location = point[0].location
             prev_location = route[i-1][0].location
             dist += curr_location.distance(prev_location)
+
+        if lane_change_end is not None:
+            lane_change_dist = point[0].location.distance(lane_change_end[0].location)
+            if lane_change_dist > 20:
+                ids_to_sample.append(i)
+                lane_change_end = None
 
         prev_option = curr_option
 
