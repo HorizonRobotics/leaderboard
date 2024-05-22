@@ -179,6 +179,7 @@ class LeaderboardEvaluator(object):
             client_timeout = args.timeout
         client.set_timeout(client_timeout)
 
+        print(f"Carla sim frame rate: {self.frame_rate}")
         settings = carla.WorldSettings(
             synchronous_mode = True,
             fixed_delta_seconds = 1.0 / self.frame_rate,
